@@ -56,6 +56,7 @@ class CourseOffering(models.Model):
 
 
 class Lecture(models.Model):
+    number = models.IntegerField(default=0)
     date = models.DateField()
     body = models.TextField(blank=True, null=True)
     offering = models.ForeignKey(CourseOffering, on_delete=models.CASCADE, null=True)

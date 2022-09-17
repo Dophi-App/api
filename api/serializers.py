@@ -34,3 +34,14 @@ class ProfessorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Professor
         fields = ('first_name', 'last_name', 'department')
+
+class LectureUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Lecture
+        fields = ('date', 'body')
+
+
+class LectureCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Lecture
+        fields = ('date', 'body', 'offering')

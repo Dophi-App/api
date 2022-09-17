@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from rest_framework import generics
 from course.models import *
 from .serializers import *
@@ -36,23 +36,6 @@ class SchoolDepartmentCourse(generics.RetrieveAPIView):
             department__school__abbreviation=school)
         return queryset
 
-class LectureList(generics.ListAPIView):
-    serializer_class = LectureSerializer
-    lookup_field = 'date'
-
-    def get_queryset(self):
-        school = self.kwargs['abbreviation']
-        dept = self.kwargs['dcode']
-        course = self.kwargs['code']
-        offering = self.kwargs['term']
-        
-        queryset = Lecture.objects.filter(
-            offering__term=offering,
-            offering__course__code=course,
-            offering__course__department__dcode=dept, 
-            offering__course__department__school__abbreviation=school)
-        return queryset
-
 class CourseOfferings(generics.ListAPIView):
     """
     Get the offerings for a particular course
@@ -85,6 +68,88 @@ class OfferingDetail(generics.RetrieveAPIView):
             course__department__dcode=dept, 
             course__department__school__abbreviation=school)
         return queryset
+
+class LectureList(generics.ListAPIView):
+    serializer_class = LectureSerializer
+    lookup_field = 'date'
+
+    def get_queryset(self):
+        school = self.kwargs['abbreviation']
+        dept = self.kwargs['dcode']
+        course = self.kwargs['code']
+        offering = self.kwargs['term']
+        
+        queryset = Lecture.objects.filter(
+            offering__term=offering,
+            offering__course__code=course,
+            offering__course__department__dcode=dept, 
+            offering__course__department__school__abbreviation=school)
+        return queryset
+
+class LectureDetail(generics.RetrieveAPIView):
+    serializer_class = LectureSerializer
+    lookup_field = 'number'
+
+    def get_queryset(self):
+        school = self.kwargs['abbreviation']
+        dept = self.kwargs['dcode']
+        course = self.kwargs['code']
+        offering = self.kwargs['term']
+        
+        queryset = Lecture.objects.filter(
+            offering__term=offering,
+            offering__course__code=course,
+            offering__course__department__dcode=dept, 
+            offering__course__department__school__abbreviation=school)
+        return queryset
+
+class LectureRUD(generics.RetrieveUpdateDestroyAPIView): 
+    serializer_class = LectureUpdateSerializer
+    lookup_field = 'number'
+
+    def get_queryset(self):
+        school = self.kwargs['abbreviation']
+        dept = self.kwargs['dcode']
+        course = self.kwargs['code']
+        offering = self.kwargs['term']
+        
+        queryset = Lecture.objects.filter(
+            offering__term=offering,
+            offering__course__code=course,
+            offering__course__department__dcode=dept, 
+            offering__course__department__school__abbreviation=school)
+        return queryset
+    
+class LectureCreate(generics.CreateAPIView): 
+    serializer_class = LectureCreateSerializer
+    # def get_queryset(self):
+    #     school = self.kwargs['abbreviation']
+    #     dept = self.kwargs['dcode']
+    #     course = self.kwargs['code']
+    #     offering = self.kwargs['term']
+        
+    #     queryset = Lecture.objects.filter(
+    #         offering__term=offering,
+    #         offering__course__code=course,
+    #         offering__course__department__dcode=dept, 
+    #         offering__course__department__school__abbreviation=school)
+    #     return queryset
+    
+    def post(self, request, *args, **kwargs):
+        school = self.kwargs['abbreviation']
+        dept = self.kwargs['dcode']
+        course = self.kwargs['code']
+        term = self.kwargs['term']
+
+        offering = get_object_or_404(CourseOffering, term=term, 
+            course__code=course, 
+            course__department__dcode=dept,
+            course__department__school__abbreviation=school)
+        
+
+
+        return self.create(request, *args, **kwargs)
+
 
 # DEPARTMENT
 class DepartmentList(generics.ListAPIView):
